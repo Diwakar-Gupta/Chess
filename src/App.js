@@ -59,6 +59,7 @@ class App extends React.Component {
             whiteCheck:false,
             blackCheck:false,
         }
+        this.moveAudio = new Audio(process.env.PUBLIC_URL + '/WoodHardHit.wav');
     }
 
     componentDidMount(){
@@ -94,6 +95,8 @@ class App extends React.Component {
             movedPiece: movedPiece,
             killedPiece: null
         });
+
+        this.moveAudio.play();
 
         this.setState({
             history: historyNew,
@@ -135,6 +138,8 @@ class App extends React.Component {
             movedPiece: movedPiece,
             killedPiece: killedPiece,
         });
+
+        this.moveAudio.play();
 
         this.setState({
             history: historyNew,
