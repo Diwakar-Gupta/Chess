@@ -4,12 +4,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretLeft, faCaretRight } from '@fortawesome/free-solid-svg-icons';
 
 import Board from './Board';
-import { Pawn, Bishop, Knight, Rook, Queen, King } from './Pieces';
+import Pieces from './Pieces';
 
 import './index.css';
 import './App.css';
 
-
+import initGame from './initGameState.json';
 
 class App extends React.Component {
     constructor(props){
@@ -27,36 +27,15 @@ class App extends React.Component {
     }
 
     componentDidMount(){
-      this.resetGame();
+      this.resetGame(initGame);
     }
 
-    resetGame() {
-      let boardState = Array(8).fill(null).map(()=>Array(8).fill(null));
-      
-      for(let j=0;j<8;j++){
-        boardState[1][j] = new Pawn('black');
-        boardState[6][j] = new Pawn('white');
-      }
-      boardState[0][2] = new Bishop('black');
-      boardState[0][5] = new Bishop('black');
-      boardState[7][2] = new Bishop('white');
-      boardState[7][5] = new Bishop('white');
+    resetGame(gameState) {
 
-      boardState[0][1] = new Knight('black');
-      boardState[0][6] = new Knight('black');
-      boardState[7][1] = new Knight('white');
-      boardState[7][6] = new Knight('white');
-
-      boardState[0][0] = new Rook('black');
-      boardState[0][7] = new Rook('black');
-      boardState[7][0] = new Rook('white');
-      boardState[7][7] = new Rook('white');
-
-      boardState[0][3] = new Queen('black');
-      boardState[7][3] = new Queen('white');
-    
-      boardState[0][4] = new King('black');
-      boardState[7][4] = new King('white');
+      let boardState = gameState.map((row) => row.map(((cell) => {
+        if(cell == null)return null;
+        return new Pieces[cell.name](cell.color);
+      })))
 
       this.setState({
         boardState

@@ -1,0 +1,178 @@
+[
+    [
+        {
+            "color": "black",
+            "name": "Rook"
+        },
+        {
+            "color": "black",
+            "name": "Knight"
+        },
+        {
+            "color": "black",
+            "name": "Bishop"
+        },
+        {
+            "color": "black",
+            "name": "Queen"
+        },
+        {
+            "color": "black",
+            "name": "King"
+        },
+        {
+            "color": "black",
+            "name": "Bishop"
+        },
+        {
+            "color": "black",
+            "name": "Knight"
+        },
+        {
+            "color": "black",
+            "name": "Rook"
+        }
+    ],
+    [
+        {
+            "color": "black",
+            "name": "Pawn"
+        },
+        {
+            "color": "black",
+            "name": "Pawn"
+        },
+        {
+            "color": "black",
+            "name": "Pawn"
+        },
+        {
+            "color": "black",
+            "name": "Pawn"
+        },
+        {
+            "color": "black",
+            "name": "Pawn"
+        },
+        {
+            "color": "black",
+            "name": "Pawn"
+        },
+        {
+            "color": "black",
+            "name": "Pawn"
+        },
+        {
+            "color": "black",
+            "name": "Pawn"
+        }
+    ],
+    [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    ],
+    [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    ],
+    [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    ],
+    [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    ],
+    [
+        {
+            "color": "white",
+            "name": "Pawn"
+        },
+        {
+            "color": "white",
+            "name": "Pawn"
+        },
+        {
+            "color": "white",
+            "name": "Pawn"
+        },
+        {
+            "color": "white",
+            "name": "Pawn"
+        },
+        {
+            "color": "white",
+            "name": "Pawn"
+        },
+        {
+            "color": "white",
+            "name": "Pawn"
+        },
+        {
+            "color": "white",
+            "name": "Pawn"
+        },
+        {
+            "color": "white",
+            "name": "Pawn"
+        }
+    ],
+    [
+        {
+            "color": "white",
+            "name": "Rook"
+        },
+        {
+            "color": "white",
+            "name": "Knight"
+        },
+        {
+            "color": "white",
+            "name": "Bishop"
+        },
+        {
+            "color": "white",
+            "name": "Queen"
+        },
+        {
+            "color": "white",
+            "name": "King"
+        },
+        {
+            "color": "white",
+            "name": "Bishop"
+        },
+        {
+            "color": "white",
+            "name": "Knight"
+        },
+        {
+            "color": "white",
+            "name": "Rook"
+        }
+    ]
+]

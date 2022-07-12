@@ -272,6 +272,15 @@ class King extends ChessPiece{
     }
 }
 
+export default {
+    Pawn,
+    Bishop,
+    Knight,
+    Rook,
+    Queen,
+    King,
+};
+
 export {
     Pawn,
     Bishop,
