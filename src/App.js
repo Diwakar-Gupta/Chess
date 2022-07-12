@@ -20,9 +20,11 @@ class App extends React.Component {
             boardState: Array(8).fill(null).map(()=>Array(8).fill(null)),
             whiteIsNext: true,
             killedPieces:{
-                black:[],
-                white:[],
-            }
+                black: {},
+                white: {},
+            },
+            whiteCheck:false,
+            blackCheck:false,
         }
     }
 
@@ -52,7 +54,7 @@ class App extends React.Component {
         boardStateNew[to[0]][to[1]] = movedPiece;
         boardStateNew[from[0]][from[1]] = null;
 
-        const historyNew = this.state.history.slice(0, this.state.stepNumber);
+        const historyNew = history.slice(0, this.state.stepNumber);
         historyNew.push({
             from:from,
             to:to,
@@ -80,12 +82,20 @@ class App extends React.Component {
         boardStateNew[from[0]][from[1]] = null;
 
         if(killedPiece.color === 'black'){
-            killedPiecesNew.black.push(killedPiece);
+            if(killedPiecesNew.black[killedPiece.name]){
+                killedPiecesNew.black[killedPiece.name] = killedPiecesNew.black[killedPiece.name]+1;
+            }else{
+                killedPiecesNew.black[killedPiece.name]=1;
+            }
         }else{
-            killedPiecesNew.white.push(killedPiece);
+            if(killedPiecesNew.white[killedPiece.name]){
+                killedPiecesNew.white[killedPiece.name] = killedPiecesNew.white[killedPiece.name]+1;
+            }else{
+                killedPiecesNew.white[killedPiece.name]=1;
+            }
         }
 
-        const historyNew = this.state.history.slice(0, this.state.stepNumber);
+        const historyNew = history.slice(0, this.state.stepNumber);
         historyNew.push({
             from:from,
             to:to,
@@ -103,22 +113,30 @@ class App extends React.Component {
     }
     
     undoMove() {
-        const { history, stepNumber, whiteIsNext, boardState } = this.state;
+        const { history, stepNumber, whiteIsNext, boardState, killedPieces } = this.state;
 
         if(stepNumber==0)return;
 
         const move = history[stepNumber-1];
-
+        
         let boardStateNew = boardState.map((row) => row.slice());
-
+        
         boardStateNew[move.from[0]][move.from[1]] = move.movedPiece;
         boardStateNew[move.to[0]][move.to[1]] = move.killedPiece;
-
-        this.setState({
+        
+        const state = {
             stepNumber: stepNumber-1,
             whiteIsNext: !whiteIsNext,
             boardState : boardStateNew,
-        });
+        };
+
+        if(move.killedPiece){
+            let killedPiecesNew = {...killedPieces};
+            killedPiecesNew[move.killedPiece.color][move.killedPiece.name]--;
+            state['killedPieces'] = killedPiecesNew;
+        }
+
+        this.setState(state);
     }
     
     redoMove() {
@@ -132,15 +150,22 @@ class App extends React.Component {
 
         boardStateNew[move.from[0]][move.from[1]] = null;
         boardStateNew[move.to[0]][move.to[1]] = move.movedPiece;
-
-        this.setState({
+        
+        const state = {
             stepNumber: stepNumber+1,
             whiteIsNext: !whiteIsNext,
             boardState : boardStateNew,
-        });
+        };
+
+        if(move.killedPiece){
+            let killedPiecesNew = {...this.state.killedPieces};
+            killedPiecesNew[move.killedPiece.color][move.killedPiece.name]++;
+            state['killedPieces'] = killedPiecesNew;
+        }
+
+        this.setState(state);
     }
-    
-    
+
     render() {
 
         const { boardState, whiteIsNext } = this.state;

@@ -201,7 +201,7 @@ class Rook extends ChessPiece{
 class Queen extends ChessPiece{
     constructor(color){
         super(color);
-        this.name = 'Rook';
+        this.name = 'Queen';
     }
 
     getView(){
@@ -242,7 +242,7 @@ class Queen extends ChessPiece{
 class King extends ChessPiece{
     constructor(color){
         super(color);
-        this.name = 'Rook';
+        this.name = 'King';
     }
 
     getView(){
