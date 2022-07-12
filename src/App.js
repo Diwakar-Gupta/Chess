@@ -11,6 +11,39 @@ import './App.css';
 
 import initGame from './initGameState.json';
 
+
+function LostPieces({ pieces, color }){
+
+    let allPieces = [["Pawn","Knight","Bishop"],["Rook","Queen","King"]];
+
+    return (
+        <div className='pieces-tray'>
+            {
+                allPieces.map((list, i) => {
+                    return (
+                        <div key={i}>
+                            {
+                                list.map((name) => {
+                                    return pieces[name]>0?
+                                    <div key={name}>
+                                        {new Pieces[name](color).getView()}
+                                        <span>
+                                            {pieces[name]}
+                                        </span>
+                                    </div>
+                                    :
+                                    <div key={name}></div>;
+                                })
+                            }
+                        </div>
+                    );
+                })
+            }
+        </div>
+    );
+}
+
+
 class App extends React.Component {
     constructor(props){
         super(props);
@@ -173,6 +206,7 @@ class App extends React.Component {
         return (
         <div className="game">
             <div className="game-info game-info-left">
+                <LostPieces color='black' pieces={this.state.killedPieces.black}/>
             </div>
             <div className="game-board">
                 <Board
@@ -187,6 +221,7 @@ class App extends React.Component {
                 </div>
             </div>
             <div className="game-info game-info-right">
+                <LostPieces color='white' pieces={this.state.killedPieces.white}/>
             </div>
         </div>
         );
