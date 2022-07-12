@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChessBishop } from '@fortawesome/free-solid-svg-icons';
+import { faChessPawn, faChessBishop, faChessKing, faChessKnight, faChessRook, faChessQueen } from '@fortawesome/free-solid-svg-icons';
 
 
 class ChessPiece{
@@ -8,11 +8,24 @@ class ChessPiece{
         this.name = null;
     }
 
+    getView(child){
+        return (<FontAwesomeIcon icon={child} color={this.color} style={{'height':'auto'}} />);
+    }
+
+    isValidMove(boardState, row, col){
+        if(row<0 || row>7 || col<0 || col>7 || boardState[row][col]?.color === this.color)return false;
+        return true;
+    }
+
+    isKillMove(boardState, row, col){
+        if(boardState[row][col] == null)return false;
+        if(boardState[row][col].color === 'white' && this.color === 'black')return true;
+        if(boardState[row][col].color === 'black' && this.color === 'white')return true;
+        return false;
+    }
+
     filterMoves(boardState, moves){
-        return moves.filter( ([row, col]) => {
-            if(row<0 || row>7 || col<0 || col>7 || boardState[row][col]?.color === this.color)return false;
-            return true;
-        } );
+        return moves.filter( ([row, col]) => this.isValidMove(boardState, row, col));
     }
 
     splitMoveKill(boardState, allMoves){
@@ -35,13 +48,17 @@ class ChessPiece{
     }
 
     getAllMoves(row, col, boardState) {
-        return [];
+        return null;
     }
 
     getMoves(row, col, boardState){
         let moves = this.getAllMoves(row, col, boardState);
         moves = this.filterMoves(boardState, moves);
-        return this.splitMoveKill(moves);
+        return this.splitMoveKill(boardState, moves);
+    }
+
+    getDirection(){
+        return this.color === 'black'?1:-1;
     }
 }
 
@@ -52,7 +69,7 @@ class Pawn extends ChessPiece{
     }
 
     getView(){
-        return (<FontAwesomeIcon icon={faChessBishop} color={this.color} style={{'height':'3rem'}} />);
+        return super.getView(faChessPawn);
     }
 
     getMoves(row, col, boardState) {
@@ -88,8 +105,180 @@ class Pawn extends ChessPiece{
     }
 }
 
+class Bishop extends ChessPiece{
+    constructor(color){
+        super(color);
+        this.name = 'Bishop';
+    }
+
+    getView(){
+        return super.getView(faChessBishop);
+    }
+
+    getAllMoves(row, col, boardState) {
+
+        const moves = [];
+
+        for(let xDir of [-1, 1]){
+            for(let yDir of [-1, 1]){
+                for(let i=row+xDir,j=col+yDir;this.isValidMove(boardState, i, j); i=i+xDir,j=j+yDir){
+                    moves.push([i, j]);
+                    if(this.isKillMove(boardState, i, j))break;
+                }
+            }
+        }
+
+        return moves;
+    }
+}
+
+class Knight extends ChessPiece{
+    constructor(color){
+        super(color);
+        this.name = 'Knight';
+    }
+
+    getView(){
+        return super.getView(faChessKnight);
+    }
+
+    getAllMoves(row, col, boardState) {
+
+        const moves = [];
+
+        const allDir = [
+            [+1, +2],
+            [+1, -2],
+            [-1, +2],
+            [-1, -2],
+            [+2, +1],
+            [-2, +1],
+            [+2, -1],
+            [-2, -1],
+        ];
+
+        for(let [x, y] of allDir){
+            moves.push([row+x, col+y])
+        }
+
+        return moves;
+    }
+}
+
+class Rook extends ChessPiece{
+    constructor(color){
+        super(color);
+        this.name = 'Rook';
+    }
+
+    getView(){
+        return super.getView(faChessRook);
+    }
+
+    getAllMoves(row, col, boardState) {
+
+        const moves = [];
+
+        const dirs = [
+            [+1, 0],
+            [-1, 0],
+            [0, +1],
+            [0, -1],
+        ];
+
+        for(let [xDir, yDir] of dirs){
+            for(let i=row+xDir,j=col+yDir;this.isValidMove(boardState, i, j); i=i+xDir,j=j+yDir){
+                moves.push([i, j]);
+
+                if(this.isKillMove(boardState, i, j))break;
+            }
+        }
+
+        return moves;
+    }
+}
+
+class Queen extends ChessPiece{
+    constructor(color){
+        super(color);
+        this.name = 'Rook';
+    }
+
+    getView(){
+        return super.getView(faChessQueen);
+    }
+
+    getAllMoves(row, col, boardState) {
+
+        const moves = [];
+
+        const dirs = [
+            [+1, 0],
+            [-1, 0],
+            [0, +1],
+            [0, -1],
+        ];
+
+        for(let [xDir, yDir] of dirs){
+            for(let i=row+xDir,j=col+yDir;this.isValidMove(boardState, i, j); i=i+xDir,j=j+yDir){
+                moves.push([i, j]);
+
+                if(this.isKillMove(boardState, i, j))break;
+            }
+        }
+        for(let xDir of [-1, 1]){
+            for(let yDir of [-1, 1]){
+                for(let i=row+xDir,j=col+yDir;this.isValidMove(boardState, i, j); i=i+xDir,j=j+yDir){
+                    moves.push([i, j]);
+                    if(this.isKillMove(boardState, i, j))break;
+                }
+            }
+        }
+
+        return moves;
+    }
+}
+
+class King extends ChessPiece{
+    constructor(color){
+        super(color);
+        this.name = 'Rook';
+    }
+
+    getView(){
+        return super.getView(faChessKing);
+    }
+
+    getAllMoves(row, col, boardState) {
+
+        const moves = [];
+
+        const dirs = [
+            [+1, 0],
+            [-1, 0],
+            [0, +1],
+            [0, -1],
+            [+1, +1],
+            [+1, -1],
+            [-1, +1],
+            [-1, -1],
+        ];
+
+        for(let [xDir, yDir] of dirs){
+            moves.push([row+xDir, col+yDir]);
+        }
+
+        return moves;
+    }
+}
+
 export {
     Pawn,
+    Bishop,
+    Knight,
+    Rook,
+    Queen,
+    King,
 };
 
 

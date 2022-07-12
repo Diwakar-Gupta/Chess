@@ -1,7 +1,7 @@
 import React from 'react';
 
 import Board from './Board';
-import { Pawn } from './Pieces';
+import { Pawn, Bishop, Knight, Rook, Queen, King } from './Pieces';
 
 import './index.css';
 import './App.css';
@@ -33,6 +33,26 @@ class App extends React.Component {
         boardState[1][j] = new Pawn('black');
         boardState[6][j] = new Pawn('white');
       }
+      boardState[0][2] = new Bishop('black');
+      boardState[0][5] = new Bishop('black');
+      boardState[7][2] = new Bishop('white');
+      boardState[7][5] = new Bishop('white');
+
+      boardState[0][1] = new Knight('black');
+      boardState[0][6] = new Knight('black');
+      boardState[7][1] = new Knight('white');
+      boardState[7][6] = new Knight('white');
+
+      boardState[0][0] = new Rook('black');
+      boardState[0][7] = new Rook('black');
+      boardState[7][0] = new Rook('white');
+      boardState[7][7] = new Rook('white');
+
+      boardState[0][3] = new Queen('black');
+      boardState[7][3] = new Queen('white');
+    
+      boardState[0][4] = new King('black');
+      boardState[7][4] = new King('white');
 
       this.setState({
         boardState
@@ -109,8 +129,8 @@ class App extends React.Component {
                 />
             </div>
             <div className="game-info">
-                <div>{ 'status' }</div>
-                <ol>{ 'moves' }</ol>
+                {/* <div>{ 'status' }</div>
+                <ol>{ 'moves' }</ol> */}
             </div>
         </div>
         );
