@@ -99,7 +99,7 @@ class Board extends React.Component {
         const { board } = this.props;
 
         return (
-            <React.Fragment>
+            <div>
                 {
                     board.map((row, i) => {
                         return (
@@ -111,7 +111,7 @@ class Board extends React.Component {
                         );
                     })
                 }      
-            </React.Fragment>
+            </div>
         );
     }
 }
