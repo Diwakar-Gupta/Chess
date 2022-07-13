@@ -99,7 +99,7 @@ class Board extends React.Component {
         const { board } = this.props;
 
         return (
-            <div>
+            <div style={{'height':'32rem', 'width':'32rem', 'marginTop': '10px'}}>
                 {
                     board.map((row, i) => {
                         return (
