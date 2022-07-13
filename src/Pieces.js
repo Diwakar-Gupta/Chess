@@ -9,7 +9,7 @@ class ChessPiece{
     }
 
     getView(child){
-        return (<FontAwesomeIcon icon={child} color={this.color} style={{'height':'auto'}} />);
+        return (<FontAwesomeIcon icon={child} color={this.color} style={{'height':'2.5rem'}} />);
     }
 
     isValidMove(boardState, row, col){
