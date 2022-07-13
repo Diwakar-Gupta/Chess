@@ -15,7 +15,7 @@
 }
 
 .game {
-  background: #708941;
+  background: #24271f;
   display: flex;
   flex-direction: row;
   height: 100vh;
@@ -38,7 +38,7 @@
 }
 
 .game-info-bottom {
-  background: green;
+  display: flex;
 }
 
 .pieces-tray {
@@ -51,7 +51,7 @@
   align-items: center;
   justify-content: space-between;
   flex-direction: column;
-  /* background: #b5b0b08f; */
+  background: #b5b0b04d;
   border-radius: 20px;
   /* border-style: inset; */
 }

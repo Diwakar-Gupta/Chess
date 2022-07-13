@@ -1,10 +1,8 @@
 import React from 'react';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretLeft, faCaretRight } from '@fortawesome/free-solid-svg-icons';
-
 import Board from './Board';
 import Pieces from './Pieces';
+import BottomControl from 'components/bottomControl/bottomControl';
 
 import './index.css';
 import './App.css';
@@ -222,7 +220,7 @@ class App extends React.Component {
                     onClick={(i) => this.handleClick(i)}
                 />
                 <div className="game-info game-info-bottom">
-                    <BottomControl undoMove={() => {this.undoMove()}} redoMove={() => {this.redoMove()}} />
+                    <BottomControl newGame={(color) => {this.resetGame(initGame);}} undoMove={() => {this.undoMove()}} redoMove={() => {this.redoMove()}} />
                 </div>
             </div>
             <div className="game-info game-info-right">
@@ -235,14 +233,4 @@ class App extends React.Component {
     
 }
 
-function BottomControl(props){
-    return (
-        <div>
-            <div>
-                <button onClick={props.undoMove}><FontAwesomeIcon icon={faCaretLeft} /></button>
-                <button onClick={props.redoMove}><FontAwesomeIcon icon={faCaretRight} /></button>
-            </div>
-        </div>
-    );
-}
 export default App;

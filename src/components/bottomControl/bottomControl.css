@@ -1,0 +1,20 @@
+.bottomControl {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between; 
+    flex-grow: 1;
+}
+
+.bottomControl .action {
+    padding: 1rem;
+    margin: 10px;
+    height: 3rem;
+    width: 3rem;
+    border-radius: 10px;
+    position: relative;
+    border-style: none;
+}
+
+.bottomControl .action > svg{
+    height: 30px;
+}
