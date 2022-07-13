@@ -22,3 +22,11 @@ ol, ul {
   left:50%;
   transform: translateX(-50%) translateY(-50%);
 }
+
+.listButtons {
+  width: 100%;
+  border: 0px;
+  font-size: large;
+  font-weight: bold;
+  margin: 0px;
+}
