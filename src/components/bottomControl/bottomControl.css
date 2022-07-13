@@ -5,7 +5,7 @@
     flex-grow: 1;
 }
 
-.bottomControl .action {
+.action {
     padding: 1rem;
     margin: 10px;
     height: 3rem;
@@ -15,10 +15,10 @@
     border-style: none;
 }
 
-.bottomControl .action[status='disabled'] {
+.action[status='disabled'] {
     background: #e2e2e24d;
 }
 
-.bottomControl .action > svg{
+.action > svg{
     height: 30px;
 }

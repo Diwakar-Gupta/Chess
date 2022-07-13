@@ -181,6 +181,17 @@ class App extends React.Component {
 
         this.setState(state);
     }
+
+    promotePawn(location, promoteTo){
+        const currentPiece = this.state.boardState[location[0]][location[1]];
+        const boardStateNew = this.state.boardState.map((row) => row.slice());
+
+        boardStateNew[location[0]][location[1]] = new Pieces[promoteTo](currentPiece.color);
+
+        this.setState({
+            boardState:boardStateNew
+        });
+    }
     
     redoMove() {
         const { history, stepNumber, whiteIsNext, boardState } = this.state;
@@ -226,6 +237,7 @@ class App extends React.Component {
                     whiteIsNext={whiteIsNext}
                     movePiece = { (from, to) => { this.movePiece(from, to) } }
                     killPiece = { (from, to) => { this.killPiece(from, to) } }
+                    promotePawn = { (location, promoteTo) => {this.promotePawn(location, promoteTo); }  }
                     onClick={(i) => this.handleClick(i)}
                 />
                 <div className="game-info game-info-bottom">

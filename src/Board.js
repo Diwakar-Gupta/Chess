@@ -15,7 +15,8 @@ class Board extends React.Component {
         super(props);
         this.state = {
             boardStatus : Array(8).fill(null).map(()=>Array(8).fill(null)),
-            selected: null
+            selected: null,
+            showPromotePawn: null,
         }
     }
 
@@ -51,12 +52,19 @@ class Board extends React.Component {
         });
     }
 
+    didPawnReachedEnd(row, col){
+        const {selected} = this.state;
+        if(this.props.board[selected[0]][selected[1]]?.name === 'Pawn' && (row === 0 || row === 7 ))return true;
+        return false;
+    }
+
     movePiece(row, col){
         this.props.movePiece(this.state.selected, [row, col]);
 
         this.setState({
             boardStatus : Array(8).fill(null).map(()=>Array(8).fill(null)),
         });
+        this.postMoveCheck(row, col);
     }
 
     killPiece(row, col){
@@ -65,6 +73,15 @@ class Board extends React.Component {
         this.setState({
             boardStatus : Array(8).fill(null).map(()=>Array(8).fill(null)),
         });
+        this.postMoveCheck(row, col);
+    }
+
+    postMoveCheck(row, col){
+        if(this.didPawnReachedEnd(row, col)){
+            this.setState({
+                showPromotePawn: [row, col],
+            });
+        }
     }
 
     onCellClick(row, col){
@@ -94,12 +111,41 @@ class Board extends React.Component {
             );
     }
 
+    promotePawnTo(name){
+        this.props.promotePawn(this.state.showPromotePawn, name);
+        this.setState({
+            showPromotePawn: null
+        });
+    }
+
+    pawnPromoteOptions() {
+        const options = ['Queen', 'Rook', 'Bishop', 'Knight'];
+
+        return (
+            <React.Fragment>
+                <h2 style={{'textAlign': 'center'}}>Promote Pawn</h2>
+                {
+                    options.map(
+                        (name) => {
+                            return (
+                                <React.Fragment key={name}>
+                                    <button onClick={ () => {this.promotePawnTo(name);}} className='action listButtons' style={{'width':'100%', 'margin':'0px', 'marginBottom':'5px'}}>{name}</button>
+                                    {/* <hr/> */}
+                                </React.Fragment>
+                            );
+                        }
+                    )
+                }
+            </React.Fragment>
+        );
+    }
+
     render() {
 
         const { board } = this.props;
 
         return (
-            <div style={{'height':'32rem', 'width':'32rem', 'marginTop': '10px'}}>
+            <div style={{'height':'32rem', 'width':'32rem', 'marginTop': '10px', 'position':'relative'}}>
                 {
                     board.map((row, i) => {
                         return (
@@ -110,7 +156,18 @@ class Board extends React.Component {
                             </div>
                         );
                     })
-                }      
+                }
+                <div className="pawnPromotePrompt" style={{
+                    'visibility':this.state.showPromotePawn?'visible':'hidden',
+                    'position': 'absolute',
+                    'left': '25%',
+                    'width': '50%',
+                    'bottom': '6rem',
+                    'background': 'white',
+                    'padding': '1rem',
+                    }}>
+                    {this.pawnPromoteOptions()}
+                </div>
             </div>
         );
     }
