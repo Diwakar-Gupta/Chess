@@ -59,7 +59,7 @@ class App extends React.Component {
             whiteCheck:false,
             blackCheck:false,
         }
-        this.moveAudio = new Audio('/WoodHardHit.wav');
+        this.moveAudio = new Audio(process.env.PUBLIC_URL + '/WoodHardHit.wav');
     }
 
     componentDidMount(){
