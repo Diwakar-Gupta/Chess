@@ -15,6 +15,10 @@
     border-style: none;
 }
 
+.bottomControl .action[status='disabled'] {
+    background: #e2e2e24d;
+}
+
 .bottomControl .action > svg{
     height: 30px;
 }

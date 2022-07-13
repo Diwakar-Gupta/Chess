@@ -8,8 +8,12 @@ function BottomControl(props){
     return (
         <div className='bottomControl'>
             <div>
-                <button className='action childCenter' onClick={props.undoMove}><FontAwesomeIcon icon={faCaretLeft} /></button>
-                <button className='action childCenter' onClick={props.redoMove}><FontAwesomeIcon icon={faCaretRight} /></button>
+                <button className='action childCenter' status={props.canUndo?'enabled':'disabled'} onClick={props.undoMove}>
+                    <FontAwesomeIcon icon={faCaretLeft} />
+                </button>
+                <button className='action childCenter' status={props.canRedo?'enabled':'disabled'} onClick={props.redoMove}>
+                    <FontAwesomeIcon icon={faCaretRight} />
+                </button>
             </div>
             <div>
                 <PopUp trigger={<button className='action childCenter'><FontAwesomeIcon icon={faGear} /></button>}>

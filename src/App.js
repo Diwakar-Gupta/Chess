@@ -205,6 +205,8 @@ class App extends React.Component {
     render() {
 
         const { boardState, whiteIsNext } = this.state;
+        const canUndo = this.state.stepNumber>0;
+        const canRedo = this.state.stepNumber<this.state.history.length;
 
         return (
         <div className="game">
@@ -220,7 +222,7 @@ class App extends React.Component {
                     onClick={(i) => this.handleClick(i)}
                 />
                 <div className="game-info game-info-bottom">
-                    <BottomControl newGame={(color) => {this.resetGame(initGame);}} undoMove={() => {this.undoMove()}} redoMove={() => {this.redoMove()}} />
+                    <BottomControl canUndo={canUndo} canRedo={canRedo} newGame={(color) => {this.resetGame(initGame);}} undoMove={() => {this.undoMove()}} redoMove={() => {this.redoMove()}} />
                 </div>
             </div>
             <div className="game-info game-info-right">
