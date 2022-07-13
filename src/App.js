@@ -66,13 +66,20 @@ class App extends React.Component {
 
     resetGame(gameState) {
 
-      let boardState = gameState.map((row) => row.map(((cell) => {
+      let boardState = gameState.board.map((row) => row.map(((cell) => {
         if(cell == null)return null;
         return new Pieces[cell.name](cell.color);
       })))
 
       this.setState({
-        boardState
+        whiteIsNext: gameState.whiteIsNext,
+        boardState,
+        history: [],
+        stepNumber: 0,
+        killedPieces:{
+            black: {},
+            white: {},
+        },
       });
     }
 
