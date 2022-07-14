@@ -143,7 +143,6 @@ class Board extends React.Component {
     render() {
 
         const { board } = this.props;
-    	const pawnPromotePrompt = this.state.showPromotePawn && (board[this.state.showPromotePawn[0]][this.state.showPromotePawn[1]].color === 'white') === this.props.whiteIsNext;
 
         return (
             <div style={{'height':'32rem', 'width':'32rem', 'marginTop': '10px', 'position':'relative'}}>
@@ -159,7 +158,7 @@ class Board extends React.Component {
                     })
                 }
                 <div className="pawnPromotePrompt" style={{
-                    'visibility': pawnPromotePrompt?'visible':'hidden',
+                    'visibility':this.state.showPromotePawn?'visible':'hidden',
                     'position': 'absolute',
                     'left': '25%',
                     'width': '50%',
