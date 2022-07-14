@@ -283,4 +283,4 @@ const exportPieces = {
 
 export default exportPieces;
 
-export exportPieces;
+export {...exportPieces};
