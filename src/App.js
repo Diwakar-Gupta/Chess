@@ -158,7 +158,7 @@ class App extends React.Component {
     undoMove() {
         const { history, stepNumber, whiteIsNext, boardState, killedPieces } = this.state;
 
-        if(stepNumber==0)return;
+        if(stepNumber===0)return;
 
         const move = history[stepNumber-1];
         
@@ -196,7 +196,7 @@ class App extends React.Component {
     redoMove() {
         const { history, stepNumber, whiteIsNext, boardState } = this.state;
 
-        if(stepNumber == history.length)return;
+        if(stepNumber === history.length)return;
 
         const move = history[stepNumber];
 
