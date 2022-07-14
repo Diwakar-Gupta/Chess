@@ -16,7 +16,7 @@ class Board extends React.Component {
         this.state = {
             boardStatus : Array(8).fill(null).map(()=>Array(8).fill(null)),
             selected: null,
-            showPromotePawn: null,
+            pawnPromoteLocation: null,
         }
     }
 
@@ -79,7 +79,7 @@ class Board extends React.Component {
     postMoveCheck(row, col){
         if(this.didPawnReachedEnd(row, col)){
             this.setState({
-                showPromotePawn: [row, col],
+                pawnPromoteLocation: [row, col],
             });
         }
     }
@@ -112,9 +112,9 @@ class Board extends React.Component {
     }
 
     promotePawnTo(name){
-        this.props.promotePawn(this.state.showPromotePawn, name);
+        this.props.promotePawn(this.state.pawnPromoteLocation, name);
         this.setState({
-            showPromotePawn: null
+            pawnPromoteLocation: null
         });
     }
 
@@ -143,6 +143,8 @@ class Board extends React.Component {
     render() {
 
         const { board } = this.props;
+    	const pawnPromotePrompt = this.state.pawnPromoteLocation &&
+			      board[this.state.pawnPromoteLocation[0]][this.state.pawnPromoteLocation[1]]?.name === 'Pawn';
 
         return (
             <div style={{'height':'32rem', 'width':'32rem', 'marginTop': '10px', 'position':'relative'}}>
@@ -158,7 +160,7 @@ class Board extends React.Component {
                     })
                 }
                 <div className="pawnPromotePrompt" style={{
-                    'visibility':this.state.showPromotePawn?'visible':'hidden',
+                    'visibility': pawnPromotePrompt?'visible':'hidden',
                     'position': 'absolute',
                     'left': '25%',
                     'width': '50%',
