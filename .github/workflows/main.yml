@@ -50,5 +50,5 @@ jobs:
         git config user.name "$(git log -n 1 --pretty=format:%an)"
         git config user.email "$(git log -n 1 --pretty=format:%ae)"
         
-        git remote set-url origin https://${github_token}@github.com/${repository}
+        git remote set-url origin https://github.com/Diwakar-Gupta/Chess.git
         npm run deploy
