@@ -272,7 +272,7 @@ class King extends ChessPiece{
     }
 }
 
-export default {
+const exportPieces = {
     Pawn,
     Bishop,
     Knight,
@@ -281,16 +281,6 @@ export default {
     King,
 };
 
-export {
-    Pawn,
-    Bishop,
-    Knight,
-    Rook,
-    Queen,
-    King,
-};
+export default exportPieces;
 
-
-/*
-faChess, faChessBishop, faChessBoard, faChessKing, faChessKnight, faChessPawn, faChessQueen, faChessRook
-*/
+export exportPieces;
