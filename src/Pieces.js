@@ -283,4 +283,11 @@ const exportPieces = {
 
 export default exportPieces;
 
-export {...exportPieces};
+export {
+    Pawn,
+    Bishop,
+    Knight,
+    Rook,
+    Queen,
+    King,
+};
