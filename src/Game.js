@@ -49,13 +49,14 @@ class Game extends React.Component {
             history: [],
             stepNumber: 0,
             boardState: Array(8).fill(null).map(()=>Array(8).fill(null)),
+            playWithoutKing: true,
             whiteIsNext: true,
             killedPieces:{
                 black: {},
                 white: {},
             },
-            whiteCheck:false,
-            blackCheck:false,
+            isWhiteKingCheck:false,
+            isBlackKingCheck:false,
         }
         this.moveAudio = new Audio(process.env.PUBLIC_URL + '/WoodHardHit.wav');
     }
@@ -66,14 +67,17 @@ class Game extends React.Component {
 
     resetGame(gameState) {
 
+      let kingCount = 0;
       let boardState = gameState.board.map((row) => row.map(((cell) => {
         if(cell == null)return null;
+        if(cell.name === 'King')kingCount++;
         return new Pieces[cell.name](cell.color);
       })))
 
       this.setState({
         whiteIsNext: gameState.whiteIsNext,
         boardState,
+        playWithoutKing:kingCount < 2,
         history: [],
         stepNumber: 0,
         killedPieces:{
@@ -118,6 +122,9 @@ class Game extends React.Component {
         let killedPiecesNew = {...killedPieces};
         const movedPiece = boardStateNew[from[0]][from[1]];
         const killedPiece = boardState[to[0]][to[1]];
+
+        // Don't kill king else pass playWithoutKing=true in state
+        if(killedPiece.name === 'King')return;
 
         boardStateNew[to[0]][to[1]] = movedPiece;
         boardStateNew[from[0]][from[1]] = null;
@@ -192,6 +199,18 @@ class Game extends React.Component {
             boardState:boardStateNew
         });
     }
+
+    setKingCheckStatus(color, isCheck){
+        if(color === 'white'){
+            this.setState({
+                isWhiteKingCheck:isCheck,
+            })
+        }else{
+            this.setState({
+                isBlackKingCheck:isCheck,
+            })
+        }
+    }
     
     redoMove() {
         const { history, stepNumber, whiteIsNext, boardState } = this.state;
@@ -222,7 +241,7 @@ class Game extends React.Component {
 
     render() {
 
-        const { boardState, whiteIsNext } = this.state;
+        const { boardState, whiteIsNext, playWithoutKing } = this.state;
         const canUndo = this.state.stepNumber>0;
         const canRedo = this.state.stepNumber<this.state.history.length;
 
@@ -230,13 +249,22 @@ class Game extends React.Component {
         <div className="game">
             <div className="game-info game-info-left">
                 <LostPieces color='black' pieces={this.state.killedPieces.black}/>
+                {
+                    this.state.isBlackKingCheck?(
+                        <span style={{'color':'white'}}>black king in check</span>
+                    ):(
+                        <span></span>
+                    )
+                }
             </div>
             <div className="game-board">
                 <Board
                     board = {boardState}
+                    playWithoutKing = {playWithoutKing}
                     whiteIsNext={whiteIsNext}
                     movePiece = { (from, to) => { this.movePiece(from, to) } }
                     killPiece = { (from, to) => { this.killPiece(from, to) } }
+                    setKingCheckStatus = { (color, isCheck) => this.setKingCheckStatus(color, isCheck) }
                     promotePawn = { (location, promoteTo) => {this.promotePawn(location, promoteTo); }  }
                     onClick={(i) => this.handleClick(i)}
                 />
@@ -246,6 +274,13 @@ class Game extends React.Component {
             </div>
             <div className="game-info game-info-right">
                 <LostPieces color='white' pieces={this.state.killedPieces.white}/>
+                {
+                    this.state.isWhiteKingCheck?(
+                        <span style={{'color':'white'}}>white king in check</span>
+                    ):(
+                        <span></span>
+                    )
+                }
             </div>
         </div>
         );

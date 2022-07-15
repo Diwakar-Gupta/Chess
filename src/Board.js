@@ -13,10 +13,62 @@ class Board extends React.Component {
 
     constructor(props){
         super(props);
+        
+        const {whiteKingLocation, blackKingLocation} = Board.getKingLocations(props.board);
+
         this.state = {
             boardStatus : Array(8).fill(null).map(()=>Array(8).fill(null)),
             selected: null,
             pawnPromoteLocation: null,
+            kingLocation:{
+                whiteKingLocation,
+                blackKingLocation,
+            },
+            checkKingCheck:false,
+        }
+    }
+
+    static getKingLocations(board){
+        let whiteKingLocation = null;
+        let blackKingLocation = null;
+
+        board.forEach((row, i) => {
+            row.forEach((piece, j) => {
+                if(piece?.name === 'King'){
+                    if(piece.color === 'white'){
+                        whiteKingLocation = [i, j];
+                    }else{
+                        blackKingLocation = [i, j];
+                    }
+                }
+            })
+        });
+        return {
+            whiteKingLocation,
+            blackKingLocation
+        };
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot){
+        if (this.props.playWithoutKing===false && (
+            this.state.kingLocation.whiteKingLocation === null ||
+            this.state.kingLocation.blackKingLocation === null ||
+            this.props.board[this.state.kingLocation.whiteKingLocation[0]][this.state.kingLocation.whiteKingLocation[1]]?.name !== 'King' ||
+            this.props.board[this.state.kingLocation.blackKingLocation[0]][this.state.kingLocation.blackKingLocation[1]]?.name !== 'King'
+            )) {
+            const {whiteKingLocation, blackKingLocation} = Board.getKingLocations(this.props.board);
+            this.setState({
+                kingLocation:{
+                    whiteKingLocation,
+                    blackKingLocation,
+                }
+            });
+        }
+        if(this.state.checkKingCheck){
+            this.isKingInCheck(this.props.whiteIsNext?'white':'black');
+            this.setState({
+                checkKingCheck:false
+            })
         }
     }
 
@@ -64,7 +116,6 @@ class Board extends React.Component {
         this.setState({
             boardStatus : Array(8).fill(null).map(()=>Array(8).fill(null)),
         });
-        this.postMoveCheck(row, col);
     }
 
     killPiece(row, col){
@@ -73,24 +124,52 @@ class Board extends React.Component {
         this.setState({
             boardStatus : Array(8).fill(null).map(()=>Array(8).fill(null)),
         });
-        this.postMoveCheck(row, col);
     }
 
     postMoveCheck(row, col){
+        this.setState({
+            checkKingCheck:true,
+        });
+        
+        // check for pawn promotion
         if(this.didPawnReachedEnd(row, col)){
             this.setState({
                 pawnPromoteLocation: [row, col],
             });
         }
+
+        // update king position
+        const {selected} = this.state;
+        if(this.props.board[selected[0]][selected[1]]?.name === 'King'){
+            const kingLocation = {...this.state.kingLocation};
+
+            if(this.props.board[selected[0]][selected[1]]?.color === 'white'){
+                kingLocation.whiteKingLocation = [row, col];
+            }else{
+                kingLocation.blackKingLocation = [row, col];
+            }
+
+            this.setState({
+                kingLocation,
+            });
+        }
+        
+    }
+
+    preMoveCheck(row, col){
     }
 
     onCellClick(row, col){
         const { boardStatus } = this.state;
         
         if(boardStatus[row][col] === CellStatus.MOVE){
+            this.preMoveCheck(row, col);
             this.movePiece(row, col);
+            this.postMoveCheck(row, col);
         }else if(boardStatus[row][col] === CellStatus.KILL){
+            this.preMoveCheck(row, col);
             this.killPiece(row, col);
+            this.postMoveCheck(row, col);
         }else {
             this.selectPiece(row, col);
         }
@@ -140,11 +219,33 @@ class Board extends React.Component {
         );
     }
 
+    getPiece(location){
+        if(location){
+            return this.props.board[location[0]][location[1]];
+        }
+        return null;
+    }
+    
+    isKingInCheck(color){
+        console.log('isKingInCheck');
+        const kingLocation = this.state.kingLocation[color === 'white'?'whiteKingLocation':'blackKingLocation'];
+        const piece = this.getPiece(kingLocation);
+
+        this.props.setKingCheckStatus('black', false);
+        this.props.setKingCheckStatus('white', false);
+
+        if(piece){
+            const isCheck = piece.isUnderAttack(this.props.board, kingLocation);
+            this.props.setKingCheckStatus(piece.color, isCheck);
+        }
+    }
+
     render() {
 
         const { board } = this.props;
     	const pawnPromotePrompt = this.state.pawnPromoteLocation &&
 			      board[this.state.pawnPromoteLocation[0]][this.state.pawnPromoteLocation[1]]?.name === 'Pawn';
+        // console.log(this.state.kingLocation.whiteKingLocation, this.state.kingLocation.blackKingLocation);
 
         return (
             <div style={{'height':'32rem', 'width':'32rem', 'marginTop': '10px', 'position':'relative'}}>
