@@ -5,7 +5,7 @@ import Pieces from './Pieces';
 import BottomControl from 'components/bottomControl/bottomControl';
 
 import './index.css';
-import './App.css';
+import './Game.css';
 
 import initGame from './initGameState.json';
 
@@ -42,7 +42,7 @@ function LostPieces({ pieces, color }){
 }
 
 
-class App extends React.Component {
+class Game extends React.Component {
     constructor(props){
         super(props);
         this.state = {
@@ -254,4 +254,4 @@ class App extends React.Component {
     
 }
 
-export default App;
+export default Game;
