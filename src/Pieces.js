@@ -8,6 +8,60 @@ class ChessPiece{
         this.name = null;
     }
 
+    static whiteBoardInfo = {
+        direction:-1,
+        home:7,
+        end:0,
+    };
+    static blackBoardInfo = {
+        direction:+1,
+        home:0,
+        end:7,
+    };
+
+    static getOpposite(color){
+        if(color === 'white'){
+            return 'black';
+        }else{
+            return 'white';
+        }
+    }
+
+    static getBoardInfo(color){
+        if(color === 'white'){
+            return this.whiteBoardInfo;
+        }else{
+            return this.blackBoardInfo;
+        }
+    }
+
+    isUnderAttack(board, location){
+
+        for(const [i, row] of board.entries() ){
+            for(const [j, piece] of row.entries() ){
+                if(piece && piece.color !== this.color){
+                    if(piece.isAttacking(board, [i, j], location)){
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    isAttacking(board, from, to){
+        const { kills } = this.getMoves(from[0], from[1], board);
+
+        for(const [r, c] of kills){
+            if(r === to[0] && c === to[1]){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     getView(child){
         return (<FontAwesomeIcon icon={child} color={this.color} style={{'height':'2.5rem'}} />);
     }
@@ -66,6 +120,22 @@ class Pawn extends ChessPiece{
     constructor(color){
         super(color);
         this.name = 'Pawn';
+    }
+
+    isAttacking(board, [row, col], to){
+        const boardInfo = ChessPiece.getBoardInfo(this.color);
+
+        let leftPiece = [row + boardInfo.direction, col-1];
+        let rightPiece = [row + boardInfo.direction, col+1];
+        
+        if(leftPiece[0] === to[0] && leftPiece[1] === to[1]){
+            return true;
+        }
+        if(rightPiece[0] === to[0] && rightPiece[1] === to[1]){
+            return true;
+        }
+        
+        return false;
     }
 
     getView(){
