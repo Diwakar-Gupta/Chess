@@ -1,6 +1,7 @@
 import React from 'react';
 
 import Board from './Board';
+import { LocalAgent } from './Agent';
 import Pieces from './Pieces';
 import BottomControl from 'components/bottomControl/bottomControl';
 
@@ -57,6 +58,10 @@ class Game extends React.Component {
             },
             isWhiteKingCheck:false,
             isBlackKingCheck:false,
+            agents:{
+                white: new LocalAgent(),
+                black: new LocalAgent(),
+            }
         }
         this.moveAudio = new Audio(process.env.PUBLIC_URL + '/WoodHardHit.wav');
     }
@@ -113,6 +118,8 @@ class Game extends React.Component {
             boardState: boardStateNew,
             whiteIsNext : !whiteIsNext
         });
+
+        return boardStateNew;
     }
     
     killPiece(from, to) {
@@ -160,6 +167,8 @@ class Game extends React.Component {
             whiteIsNext : !whiteIsNext,
             killedPieces : killedPiecesNew
         });
+
+        return boardStateNew;
     }
     
     undoMove() {
@@ -260,6 +269,8 @@ class Game extends React.Component {
             <div className="game-board">
                 <Board
                     board = {boardState}
+                    whiteAgent = { this.state.agents.white }
+                    blackAgent = { this.state.agents.black }
                     playWithoutKing = {playWithoutKing}
                     whiteIsNext={whiteIsNext}
                     movePiece = { (from, to) => { this.movePiece(from, to) } }
