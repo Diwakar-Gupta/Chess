@@ -4,9 +4,16 @@ import Cell from './Cell';
 
 
 const CellStatus = {
+    EMPTY: null,
 	MOVE: 0,
 	KILL: 1,
 	SELECTED: 2,
+}
+
+const CellAction = {
+    MOVE: 0,
+    KILL: 1,
+    SELECT: 2,
 }
 
 class Board extends React.Component {
@@ -26,6 +33,18 @@ class Board extends React.Component {
             },
             checkKingCheck:false,
         }
+
+        this.initAgent('white', props.whiteAgent);
+        this.initAgent('black', props.blackAgent);
+    }
+    
+    initAgent(color, agent){
+        agent.init(
+            color,
+            (location) => {this.agentMoveListener(color, CellAction.SELECT, location)},
+            (from, to) => {this.agentMoveListener(color, CellAction.MOVE, from, to)},
+            (from, to) => {this.agentMoveListener(color, CellAction.KILL, from, to)},
+        );
     }
 
     static getKingLocations(board){
@@ -110,23 +129,27 @@ class Board extends React.Component {
         return false;
     }
 
-    movePiece(row, col){
-        this.props.movePiece(this.state.selected, [row, col]);
+    movePiece(from, [row, col]){
+        const latestBoard = this.props.movePiece(from, [row, col]);
 
         this.setState({
             boardStatus : Array(8).fill(null).map(()=>Array(8).fill(null)),
         });
+
+        return latestBoard;
     }
 
-    killPiece(row, col){
-        this.props.killPiece(this.state.selected, [row, col]);
+    killPiece(from, to){
+        const latestBoard = this.props.killPiece(from, to);
         
         this.setState({
             boardStatus : Array(8).fill(null).map(()=>Array(8).fill(null)),
         });
+
+        return latestBoard;
     }
 
-    postMoveCheck(row, col){
+    postMoveCheck(from, [row, col]){
         this.setState({
             checkKingCheck:true,
         });
@@ -156,22 +179,71 @@ class Board extends React.Component {
         
     }
 
-    preMoveCheck(row, col){
+    preMoveCheck(from, to){
+    }
+
+    getAgent(opponent=false){
+        let color=null;
+        if(opponent){
+            color = this.props.whiteIsNext?'black':'white';
+        }else{
+            color = this.props.whiteIsNext?'white':'black';
+        }
+
+        if(color === 'white'){
+            return this.props.whiteAgent;
+        } else {
+            return this.props.blackAgent;
+        }
+    }
+
+    getCurrentTurn(){
+        return this.props.whiteIsNext?'white':'black';
+    }
+
+    agentMoveListener(color, cellAction, from, to){
+
+        const opponentAgent = this.getAgent(true);
+
+        if(color !== this.getCurrentTurn())return;
+
+        let latersBoard = null;
+        switch (cellAction) {
+
+            case CellAction.SELECT:
+                this.selectPiece(...from);
+                opponentAgent.opponentSelected(from);
+                break;
+            
+            case CellAction.KILL:
+                this.preMoveCheck(from, to);
+                latersBoard = this.killPiece(from, to);
+                this.postMoveCheck(from, to, latersBoard);
+                opponentAgent.opponentKilled(from, to, latersBoard);
+                break;
+            
+            case CellAction.MOVE:
+                this.preMoveCheck(from, to);
+                latersBoard = this.movePiece(from, to);
+                this.postMoveCheck(from, to, latersBoard);
+                opponentAgent.opponentMoved(from, to, latersBoard);
+                break
+            default:
+                break;
+        }
     }
 
     onCellClick(row, col){
         const { boardStatus } = this.state;
+
+        const currentAgent = this.getAgent();
         
         if(boardStatus[row][col] === CellStatus.MOVE){
-            this.preMoveCheck(row, col);
-            this.movePiece(row, col);
-            this.postMoveCheck(row, col);
+            currentAgent.cellClickListener('move', [row, col]);
         }else if(boardStatus[row][col] === CellStatus.KILL){
-            this.preMoveCheck(row, col);
-            this.killPiece(row, col);
-            this.postMoveCheck(row, col);
+            currentAgent.cellClickListener('kill', [row, col]);
         }else {
-            this.selectPiece(row, col);
+            currentAgent.cellClickListener('select', [row, col]);
         }
     }
 
