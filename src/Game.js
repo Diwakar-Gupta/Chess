@@ -1,5 +1,6 @@
 import React from 'react';
 
+import moveSoundFile from './WoodHardHit.wav';
 import Board from './Board';
 import { LocalAgent } from './Agent';
 import Pieces from './Pieces';
@@ -63,7 +64,7 @@ class Game extends React.Component {
                 black: new LocalAgent(),
             }
         }
-        this.moveAudio = new Audio(process.env.PUBLIC_URL + '/WoodHardHit.wav');
+        this.moveAudio = new Audio(moveSoundFile);
     }
 
     componentDidMount(){
