@@ -92,82 +92,19 @@ class Game extends React.Component {
         },
       });
     }
-
-    movePiece(from, to) {
-        const { boardState, whiteIsNext, history } = this.state;
-
-        let boardStateNew = boardState.map((row) => row.slice());
-
-        const movedPiece = boardStateNew[from[0]][from[1]];
-
-        boardStateNew[to[0]][to[1]] = movedPiece;
-        boardStateNew[from[0]][from[1]] = null;
-
-        const historyNew = history.slice(0, this.state.stepNumber);
-        historyNew.push({
-            from:from,
-            to:to,
-            movedPiece: movedPiece,
-            killedPiece: null
-        });
-
-        this.moveAudio.play();
-
-        this.setState({
-            history: historyNew,
-            stepNumber: historyNew.length,
-            boardState: boardStateNew,
-            whiteIsNext : !whiteIsNext
-        });
-
-        return boardStateNew;
-    }
     
-    killPiece(from, to) {
-        const { boardState, whiteIsNext, history, killedPieces } = this.state;
-
-        let boardStateNew = boardState.map((row) => row.slice());
-        let killedPiecesNew = {...killedPieces};
-        const movedPiece = boardStateNew[from[0]][from[1]];
-        const killedPiece = boardState[to[0]][to[1]];
-
-        // Don't kill king else pass playWithoutKing=true in state
-        if(killedPiece.name === 'King')return;
-
-        boardStateNew[to[0]][to[1]] = movedPiece;
-        boardStateNew[from[0]][from[1]] = null;
-
-        if(killedPiece.color === 'black'){
-            if(killedPiecesNew.black[killedPiece.name]){
-                killedPiecesNew.black[killedPiece.name] = killedPiecesNew.black[killedPiece.name]+1;
-            }else{
-                killedPiecesNew.black[killedPiece.name]=1;
-            }
-        }else{
-            if(killedPiecesNew.white[killedPiece.name]){
-                killedPiecesNew.white[killedPiece.name] = killedPiecesNew.white[killedPiece.name]+1;
-            }else{
-                killedPiecesNew.white[killedPiece.name]=1;
-            }
-        }
+    movePiece(moveObj) {
+        const history = this.state.history;
 
         const historyNew = history.slice(0, this.state.stepNumber);
-        historyNew.push({
-            from:from,
-            to:to,
-            movedPiece: movedPiece,
-            killedPiece: killedPiece,
+        historyNew.push(moveObj);
+        this.setState({
+            history: historyNew
         });
 
         this.moveAudio.play();
 
-        this.setState({
-            history: historyNew,
-            stepNumber: historyNew.length,
-            boardState: boardStateNew,
-            whiteIsNext : !whiteIsNext,
-            killedPieces : killedPiecesNew
-        });
+        const boardStateNew = this.redoMove();
 
         return boardStateNew;
     }
@@ -181,22 +118,21 @@ class Game extends React.Component {
         
         let boardStateNew = boardState.map((row) => row.slice());
         
-        boardStateNew[move.from[0]][move.from[1]] = move.movedPiece;
-        boardStateNew[move.to[0]][move.to[1]] = move.killedPiece;
-        
-        const state = {
+        if(move.isKill()){
+            let killedPiecesNew = {...killedPieces};
+            move.undo(boardStateNew, killedPiecesNew);
+            this.setState({
+                killedPieces : killedPiecesNew
+            });
+        }else{
+            move.undo(boardStateNew);
+        }
+
+        this.setState({
             stepNumber: stepNumber-1,
             whiteIsNext: !whiteIsNext,
             boardState : boardStateNew,
-        };
-
-        if(move.killedPiece){
-            let killedPiecesNew = {...killedPieces};
-            killedPiecesNew[move.killedPiece.color][move.killedPiece.name]--;
-            state['killedPieces'] = killedPiecesNew;
-        }
-
-        this.setState(state);
+        });
     }
 
     promotePawn(location, promoteTo){
@@ -223,30 +159,33 @@ class Game extends React.Component {
     }
     
     redoMove() {
-        const { history, stepNumber, whiteIsNext, boardState } = this.state;
+        const { history, stepNumber, whiteIsNext, boardState, killedPieces } = this.state;
 
         if(stepNumber === history.length)return;
 
-        const move = history[stepNumber];
+        const moveObj = history[stepNumber];
 
         let boardStateNew = boardState.map((row) => row.slice());
 
-        boardStateNew[move.from[0]][move.from[1]] = null;
-        boardStateNew[move.to[0]][move.to[1]] = move.movedPiece;
-        
+        if(moveObj.isKill()){
+            let killedPiecesNew = {...killedPieces};
+            moveObj.redo(boardStateNew, killedPiecesNew);
+            this.setState({
+                killedPieces : killedPiecesNew
+            });
+        }else{
+            moveObj.redo(boardStateNew);
+        }
+
         const state = {
             stepNumber: stepNumber+1,
             whiteIsNext: !whiteIsNext,
             boardState : boardStateNew,
         };
 
-        if(move.killedPiece){
-            let killedPiecesNew = {...this.state.killedPieces};
-            killedPiecesNew[move.killedPiece.color][move.killedPiece.name]++;
-            state['killedPieces'] = killedPiecesNew;
-        }
-
         this.setState(state);
+
+        return boardStateNew;
     }
 
     render() {
@@ -274,8 +213,8 @@ class Game extends React.Component {
                     blackAgent = { this.state.agents.black }
                     playWithoutKing = {playWithoutKing}
                     whiteIsNext={whiteIsNext}
-                    movePiece = { (from, to) => { this.movePiece(from, to) } }
-                    killPiece = { (from, to) => { this.killPiece(from, to) } }
+                    movePiece = { (obj) => { this.movePiece(obj) } }
+                    killPiece = { (obj) => { this.movePiece(obj) } }
                     setKingCheckStatus = { (color, isCheck) => this.setKingCheckStatus(color, isCheck) }
                     promotePawn = { (location, promoteTo) => {this.promotePawn(location, promoteTo); }  }
                     onClick={(i) => this.handleClick(i)}

@@ -1,6 +1,7 @@
 import React from 'react';
 
 import Cell from './Cell';
+import Moves from './Moves';
 
 
 const CellStatus = {
@@ -130,7 +131,8 @@ class Board extends React.Component {
     }
 
     movePiece(from, [row, col]){
-        const latestBoard = this.props.movePiece(from, [row, col]);
+        const obj = new Moves.Safe(this.props.board, from, [row, col]);
+        const latestBoard = this.props.movePiece(obj);
 
         this.setState({
             boardStatus : Array(8).fill(null).map(()=>Array(8).fill(null)),
@@ -140,7 +142,8 @@ class Board extends React.Component {
     }
 
     killPiece(from, to){
-        const latestBoard = this.props.killPiece(from, to);
+        const obj = new Moves.Kill(this.props.board, from, to);
+        const latestBoard = this.props.killPiece(obj);
         
         this.setState({
             boardStatus : Array(8).fill(null).map(()=>Array(8).fill(null)),
