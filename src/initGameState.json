@@ -1,5 +1,6 @@
 {
     "whiteIsNext":true,
+    "localColor":"white",
     "board": [
         [
             {

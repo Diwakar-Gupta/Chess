@@ -246,7 +246,8 @@ class Board extends React.Component {
         }else if(boardStatus[row][col] === CellStatus.KILL){
             currentAgent.cellClickListener('kill', [row, col]);
         }else {
-            currentAgent.cellClickListener('select', [row, col]);
+            if(this.props.board[row][col]?.color === this.getCurrentTurn())
+                currentAgent.cellClickListener('select', [row, col]);
         }
     }
 
@@ -317,24 +318,38 @@ class Board extends React.Component {
 
     render() {
 
-        const { board } = this.props;
+        const { board, localColor } = this.props;
     	const pawnPromotePrompt = this.state.pawnPromoteLocation &&
 			      board[this.state.pawnPromoteLocation[0]][this.state.pawnPromoteLocation[1]]?.name === 'Pawn';
         // console.log(this.state.kingLocation.whiteKingLocation, this.state.kingLocation.blackKingLocation);
 
+        let boardView;
+        
+        if(localColor === 'white'){
+            boardView = board.map((row, i) => {
+                return (
+                    <div key={i} className="board-row">
+                        {
+                            row.map((e, j) => this.renderCell(i, j ))
+                        }
+                    </div>
+                );
+            });
+        }else{
+            boardView = board.map(( row , i) => {
+                return (
+                    <div key={i} className="board-row">
+                        {
+                            row.map((e, j) => this.renderCell(board.length - 1 - i, row.length - 1 - j))
+                        }
+                    </div>
+                );
+            });
+        }
+
         return (
             <div style={{'height':'32rem', 'width':'32rem', 'marginTop': '10px', 'position':'relative'}}>
-                {
-                    board.map((row, i) => {
-                        return (
-                            <div key={i} className="board-row">
-                                {
-                                    row.map((e, j) => this.renderCell(i, j) )
-                                }
-                            </div>
-                        );
-                    })
-                }
+                { boardView }
                 <div className="pawnPromotePrompt" style={{
                     'visibility': pawnPromotePrompt?'visible':'hidden',
                     'position': 'absolute',
