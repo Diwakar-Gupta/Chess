@@ -51,6 +51,7 @@ class Game extends React.Component {
             history: [],
             stepNumber: 0,
             boardState: Array(8).fill(null).map(()=>Array(8).fill(null)),
+            localColor: 'white',
             playWithoutKing: true,
             whiteIsNext: true,
             killedPieces:{
@@ -82,6 +83,7 @@ class Game extends React.Component {
 
       this.setState({
         whiteIsNext: gameState.whiteIsNext,
+        localColor: gameState.localColor,
         boardState,
         playWithoutKing:kingCount < 2,
         history: [],
@@ -223,6 +225,7 @@ class Game extends React.Component {
             <div className="game-board">
                 <Board
                     board = {boardState}
+                    localColor = { this.state.localColor }
                     whiteAgent = { this.state.agents.white }
                     blackAgent = { this.state.agents.black }
                     playWithoutKing = {playWithoutKing}
@@ -234,7 +237,7 @@ class Game extends React.Component {
                     onClick={(i) => this.handleClick(i)}
                 />
                 <div className="game-info game-info-bottom">
-                    <BottomControl canUndo={canUndo} canRedo={canRedo} newGame={(color) => {this.resetGame(initGame);}} undoMove={() => {this.undoMove()}} redoMove={() => {this.redoMove()}} />
+                    <BottomControl canUndo={canUndo} canRedo={canRedo} newGame={(color) => {let initGameColor = {...initGame, localColor:color};this.resetGame(initGameColor);}} undoMove={() => {this.undoMove()}} redoMove={() => {this.redoMove()}} />
                 </div>
             </div>
             <div className="game-info game-info-right">
