@@ -9,12 +9,14 @@ const CellStatus = {
 	MOVE: 0,
 	KILL: 1,
 	SELECTED: 2,
+    SAFE: 3,
 }
 
 const CellAction = {
     MOVE: 0,
     KILL: 1,
     SELECT: 2,
+    SAFE: 3,
 }
 
 class Board extends React.Component {
@@ -27,7 +29,7 @@ class Board extends React.Component {
         this.state = {
             boardStatus : Array(8).fill(null).map(()=>Array(8).fill(null)),
             selected: null,
-            pawnPromoteLocation: null,
+            pawnPromoteSubscribe: null,
             kingLocation:{
                 whiteKingLocation,
                 blackKingLocation,
@@ -43,9 +45,30 @@ class Board extends React.Component {
         agent.init(
             color,
             (location) => {this.agentMoveListener(color, CellAction.SELECT, location)},
-            (from, to) => {this.agentMoveListener(color, CellAction.MOVE, from, to)},
+            (from, to) => {this.agentMoveListener(color, CellAction.SAFE, from, to)},
             (from, to) => {this.agentMoveListener(color, CellAction.KILL, from, to)},
+            (move) => {this.agentMoveListener(color, CellAction.MOVE, move)},
+            () => {this.requestPawnPromotePrompt(color)}
         );
+    }
+
+    requestPawnPromotePrompt(color){
+        if(color === this.getCurrentTurn()){
+            this.setState({
+                pawnPromoteSubscribe: {
+                    color: color,
+                    callBack: (promoteTo) => {
+                        this.setState({
+                            pawnPromoteSubscribe: null,
+                        });
+                        this.getAgent().pawnPromoteListener(promoteTo);
+                    },
+                }
+            });
+            return true;
+        }else{
+            return false;
+        }
     }
 
     static getKingLocations(board){
@@ -110,7 +133,7 @@ class Board extends React.Component {
             selected = [row, col];
             
             for(let [r, c] of moves){
-                boardStatusNew[r][c] = CellStatus.MOVE;
+                boardStatusNew[r][c] = CellStatus.SAFE;
             }
             for(let [r, c] of kills){
                 boardStatusNew[r][c] = CellStatus.KILL;
@@ -124,13 +147,17 @@ class Board extends React.Component {
         });
     }
 
-    didPawnReachedEnd(row, col){
-        const {selected} = this.state;
-        if(this.props.board[selected[0]][selected[1]]?.name === 'Pawn' && (row === 0 || row === 7 ))return true;
-        return false;
+    movePiece(move){
+        const latestBoard = this.props.movePiece(move);
+
+        this.setState({
+            boardStatus : Array(8).fill(null).map(()=>Array(8).fill(null)),
+        });
+
+        return latestBoard;
     }
 
-    movePiece(from, [row, col]){
+    safeMovePiece(from, [row, col]){
         const obj = new Moves.Safe(this.props.board, from, [row, col]);
         const latestBoard = this.props.movePiece(obj);
 
@@ -141,7 +168,7 @@ class Board extends React.Component {
         return latestBoard;
     }
 
-    killPiece(from, to){
+    killMovePiece(from, to){
         const obj = new Moves.Kill(this.props.board, from, to);
         const latestBoard = this.props.killPiece(obj);
         
@@ -156,13 +183,6 @@ class Board extends React.Component {
         this.setState({
             checkKingCheck:true,
         });
-        
-        // check for pawn promotion
-        if(this.didPawnReachedEnd(row, col)){
-            this.setState({
-                pawnPromoteLocation: [row, col],
-            });
-        }
 
         // update king position
         const {selected} = this.state;
@@ -220,17 +240,24 @@ class Board extends React.Component {
             
             case CellAction.KILL:
                 this.preMoveCheck(from, to);
-                latersBoard = this.killPiece(from, to);
+                latersBoard = this.killMovePiece(from, to);
                 this.postMoveCheck(from, to, latersBoard);
                 opponentAgent.opponentKilled(from, to, latersBoard);
                 break;
             
-            case CellAction.MOVE:
+            case CellAction.SAFE:
                 this.preMoveCheck(from, to);
-                latersBoard = this.movePiece(from, to);
+                latersBoard = this.safeMovePiece(from, to);
                 this.postMoveCheck(from, to, latersBoard);
-                opponentAgent.opponentMoved(from, to, latersBoard);
+                opponentAgent.opponentSafe(from, to, latersBoard);
                 break
+            
+            case CellAction.MOVE:
+                const move = from;
+                this.preMoveCheck(move.from, move.to);
+                latersBoard = this.movePiece(move);
+                opponentAgent.opponentMoved(move, latersBoard);
+                
             default:
                 break;
         }
@@ -241,13 +268,12 @@ class Board extends React.Component {
 
         const currentAgent = this.getAgent();
         
-        if(boardStatus[row][col] === CellStatus.MOVE){
-            currentAgent.cellClickListener('move', [row, col]);
+        if(boardStatus[row][col] === CellStatus.SAFE){
+            currentAgent.cellClickListener('safe', this.props.board, [row, col]);
         }else if(boardStatus[row][col] === CellStatus.KILL){
-            currentAgent.cellClickListener('kill', [row, col]);
-        }else {
-            if(this.props.board[row][col]?.color === this.getCurrentTurn())
-                currentAgent.cellClickListener('select', [row, col]);
+            currentAgent.cellClickListener('kill', this.props.board, [row, col]);
+        }else if(this.props.board[row][col]?.color === this.getCurrentTurn()){
+            currentAgent.cellClickListener('select', this.props.board, [row, col]);
         }
     }
 
@@ -256,7 +282,7 @@ class Board extends React.Component {
             <Cell
                 key={col}
                 selected={this.state.boardStatus[row][col] === CellStatus.SELECTED}
-                move={this.state.boardStatus[row][col] === CellStatus.MOVE}
+                move={this.state.boardStatus[row][col] === CellStatus.SAFE}
                 kill={this.state.boardStatus[row][col] === CellStatus.KILL}
                 
                 color={(row+col) %2 === 0 ? 'white': 'black'}
@@ -284,7 +310,7 @@ class Board extends React.Component {
                         (name) => {
                             return (
                                 <React.Fragment key={name}>
-                                    <button onClick={ () => {this.promotePawnTo(name);}} className='action listButtons' style={{'width':'100%', 'margin':'0px', 'marginBottom':'5px'}}>{name}</button>
+                                    <button onClick={ () => {this.state.pawnPromoteSubscribe.callBack(name);}} className='action listButtons' style={{'width':'100%', 'margin':'0px', 'marginBottom':'5px'}}>{name}</button>
                                     {/* <hr/> */}
                                 </React.Fragment>
                             );
@@ -319,9 +345,7 @@ class Board extends React.Component {
     render() {
 
         const { board, localColor } = this.props;
-    	const pawnPromotePrompt = this.state.pawnPromoteLocation &&
-			      board[this.state.pawnPromoteLocation[0]][this.state.pawnPromoteLocation[1]]?.name === 'Pawn';
-        // console.log(this.state.kingLocation.whiteKingLocation, this.state.kingLocation.blackKingLocation);
+    	const pawnPromotePrompt = this.state.pawnPromoteSubscribe;
 
         let boardView;
         
