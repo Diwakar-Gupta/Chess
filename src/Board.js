@@ -250,16 +250,17 @@ class Board extends React.Component {
                 latersBoard = this.safeMovePiece(from, to);
                 this.postMoveCheck(from, to, latersBoard);
                 opponentAgent.opponentSafe(from, to, latersBoard);
-                break
+                break;
             
             case CellAction.MOVE:
                 const move = from;
                 this.preMoveCheck(move.from, move.to);
                 latersBoard = this.movePiece(move);
                 opponentAgent.opponentMoved(move, latersBoard);
-                
-            default:
                 break;
+			
+            default:
+                
         }
     }
 
