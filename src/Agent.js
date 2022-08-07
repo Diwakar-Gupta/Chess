@@ -41,7 +41,7 @@ class LocalAgent extends Agent {
             }
         }else if(type === 'kill'){
             if(this.willPawnReachEnd(board, this.selectedLocation, location)){
-                this.pawnPromoteBaseMove = new Moves.Safe(board, this.selectedLocation, location);
+                this.pawnPromoteBaseMove = new Moves.Kill(board, this.selectedLocation, location);
                 this.requestPawnPromotePrompt();
             }else{
                 this.killCell(this.selectedLocation, location);
