@@ -161,17 +161,6 @@ class Game extends React.Component {
         });
     }
 
-    promotePawn(location, promoteTo){
-        const currentPiece = this.state.boardState[location[0]][location[1]];
-        const boardStateNew = this.state.boardState.map((row) => row.slice());
-
-        boardStateNew[location[0]][location[1]] = new Pieces[promoteTo](currentPiece.color);
-
-        this.setState({
-            boardState:boardStateNew
-        });
-    }
-
     setKingCheckStatus(color, isCheck){
         if(color === 'white'){
             this.setState({
@@ -233,7 +222,6 @@ class Game extends React.Component {
                     movePiece = { (obj) => { this.movePiece(obj) } }
                     killPiece = { (obj) => { this.movePiece(obj) } }
                     setKingCheckStatus = { (color, isCheck) => this.setKingCheckStatus(color, isCheck) }
-                    promotePawn = { (location, promoteTo) => {this.promotePawn(location, promoteTo); }  }
                     onClick={(i) => this.handleClick(i)}
                 />
                 <div className="game-info game-info-bottom">

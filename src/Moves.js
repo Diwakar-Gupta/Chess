@@ -1,3 +1,5 @@
+import Pieces from './Pieces';
+
 class Move {
 
     isKill(){
@@ -8,6 +10,47 @@ class Move {
         return false;
     }
 
+    isPawnPromote(){
+        return false;
+    }
+
+}
+
+class PawnPromote extends Move {
+    constructor(board, from, to, baseMove, promoteTo){
+        super();
+        this.from = from;
+        this.to = to;
+        this.promoteTo = promoteTo;
+        this.baseMove = baseMove;
+    }
+
+    isPawnPromote(){
+        return true;
+    }
+
+    isKill(){
+        return this.baseMove.isKill();
+    }
+
+    isSafe(){
+        return this.baseMove.isSafe();
+    }
+
+    redo(board, killedPiecesNew){
+        const movedPiece = this.baseMove.movedPiece;
+        
+        this.baseMove.redo(board, killedPiecesNew);
+        
+        const promotedPiece = new Pieces[this.promoteTo](movedPiece.color);
+        board[this.to[0]][this.to[1]] = promotedPiece;
+    }
+
+    undo(board, killedPiecesNew){
+        board[this.to[0]][this.to[1]] = this.baseMove.movedPiece;
+        
+        this.baseMove.undo(board, killedPiecesNew);
+    }
 }
 
 class Safe extends Move {
@@ -95,6 +138,7 @@ class Kill extends Move {
 const exportMoves = {
     Kill,
     Safe,
+    PawnPromote,
 };
 
 export default exportMoves;
@@ -102,4 +146,5 @@ export default exportMoves;
 export {
     Kill,
     Safe,
+    PawnPromote,
 };
