@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/Chess/static/css/main.5252527e.css",
+    "main.js": "/Chess/static/js/main.ce0a1c8f.js",
+    "static/js/787.497f1025.chunk.js": "/Chess/static/js/787.497f1025.chunk.js",
+    "static/media/WoodHardHit.wav": "/Chess/static/media/WoodHardHit.a82842e0c649659040b6.wav",
+    "index.html": "/Chess/index.html",
+    "main.5252527e.css.map": "/Chess/static/css/main.5252527e.css.map",
+    "main.ce0a1c8f.js.map": "/Chess/static/js/main.ce0a1c8f.js.map",
+    "787.497f1025.chunk.js.map": "/Chess/static/js/787.497f1025.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.5252527e.css",
+    "static/js/main.ce0a1c8f.js"
+  ]
+}
